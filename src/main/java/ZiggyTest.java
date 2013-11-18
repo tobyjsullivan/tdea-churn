@@ -20,7 +20,7 @@ class ZiggyTest {
 		private static final int MIN_COMBO_LENGTH = 1;
 		private static final int MAX_COMBO_LENGTH = 8;
 		
-		private static final long MIN_TEST_VALUE = 569500030L;
+		private static final long MIN_TEST_VALUE = 61303500040L;
 		private static final long MAX_TEST_VALUE = 281474976710656L;
 		
 		private static int comboLength = 0;
@@ -77,7 +77,6 @@ class ZiggyTest {
                 }
                 
                 if(i == nextStat) {
-                	nextStat += 1000000;
                 	
                 	long now = System.currentTimeMillis();
                 	float timeDiff = (float)(now - stamp)/1000; // Convert to seconds
@@ -94,6 +93,8 @@ class ZiggyTest {
                 	String printable = DatatypeConverter.printBase64Binary(codedtext);
                 	
                 	System.out.println("Password: " + i + "; "+ printable + "; Rate: " + rate + "; ETA: " + estimatedTimeRemaining(MAX_TEST_VALUE - i, rate));
+
+                	nextStat += (long)Math.min(rate, 1000000);
                 }
         	}
             
