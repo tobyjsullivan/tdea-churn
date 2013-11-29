@@ -1,4 +1,4 @@
-package main.java;
+package code;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -25,31 +25,42 @@ class ZiggyTest {
 		
 		private static int comboLength = 0;
 
-        public static void main(String[] args) throws Exception{  
-//            if(RANGE.length() != RANGE_SIZE_EXPECTED) {
-//            	throw new Exception("Bad range length");
-//            }
-//        	
-//        	
-//            for(comboLength = MIN_COMBO_LENGTH; comboLength <= MAX_COMBO_LENGTH; comboLength++) {
-//                long total = calcNumCombos();
-//	        	for(long j = 0; j < total; j++) {
-//	        		String combo = getCombo(j);
-//	
-//	                if(testPassword(combo)) {
-//	                	System.out.println("SUCCESS: "+combo);
-//	                	System.exit(0);
-//	                }
-//	        	}
-//            }
+		public static ZiggyContext generateContext() throws Exception {
+			return new ZiggyContext(targetHash, text);
+		}
+		
+		public static long testRange(long min, long max, ZiggyContext ctx) throws Exception {
+        	for(long i = min; i <= max; i++) {
+        		byte[] keyBytes = getBytes(i);
+        		
+        		SecretKey key = new SecretKeySpec(keyBytes, "DESede");
+        		ctx.cipher.init(Cipher.ENCRYPT_MODE, key, ctx.iv);
+
+                byte[] codedtext = ctx.cipher.doFinal(ctx.plainTextBytes);
+        		
+                
+                if(byteArraysEqual(codedtext, ctx.targetCipher)) {
+
+                	String printable = DatatypeConverter.printBase64Binary(codedtext);
+                	System.out.println("Password: " + i + "; "+ printable);
+                	System.out.println("SUCCESS: " + i);
+                	return i;
+                }
+                
+        	}
+        	
+        	return -1;
+		}
+		
+        public static void main(String[] args) throws Exception{
         	
         	long stamp = System.currentTimeMillis();
         	long lastI = 0;
         	float rate = 0;
         	
         	long nextStat = MIN_TEST_VALUE + 10;
-        	
-        	byte[] targetCipher = DatatypeConverter.parseBase64Binary(targetHash);
+
+			byte[] targetCipher = DatatypeConverter.parseBase64Binary(targetHash);
 
             IvParameterSpec iv = new IvParameterSpec(new byte[8]);
             Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
